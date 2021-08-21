@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="../public/icons/movie_logo.png" type="image/x-icon" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap&subset=cyrillic-ext" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <header class="header"> 
+        <div class="header__search">
+            <form>   
+                <input type="text" placeholder="Search" name="searchPanel" onkeyup="search(event)" autocomplete="off">
+            </form>
+        </div>
+        <div class="header__logo">
+            <img src="icons/Logotype.svg" alt="logo">
+        </div>
+    </header>
+
+    <main class="promo">
+        <div class="promo__menu">
+            <nav class="promo__menu-list">
+                <ul>
+                    <li><a class="promo__menu-item promo__menu-item_active" id="whToWatch" href="/">What to Watch</a></li>
+                    <li><a class="promo__menu-item" id="favorites" onclick="favorite(event)">Favorites</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="promo__content">
+            <div class="promo__bg">
+                <div class="promo__genre" id="promo__genre">DRAMA</div>
+                <div class="promo__title" id="promo__title">The Martian</div>
+                <div class="promo__descr" id="promo__descr">THE STORY OF A MAN SURVIVING ON ANOTHER PLANET ALONE</div>
+            </div>
+            <div class="promo__interactive" id="promoDiv">
+                <div>
+                    <div class="promo__interactive-title" id="promoTitle">WATCH LIST</div>
+                    <ul class="promo__interactive-list">
+                        <% myMovie.forEach(function(item) { %>
+                            <% if(item.favorite == "on") { %>
+                                <form action="/delete" method="POST">
+                                    <li class="promo__interactive-item"> <%= item.title %>
+                                        <button type="submit" value="<%= item._id %>" class="delete" name='deleteBtn'></button> 
+                                        <span class="star"></span>
+                                    </li>
+                                </form>
+                            <% } else{ %>
+                                <form action="/delete" method="POST">
+                                    <li class="promo__interactive-item"> <%= item.title %>
+                                        <button type="submit" value="<%= item._id %>" class="delete" name='deleteBtn'></button> 
+                                    </li>
+                                </form>
+                            <% } %>
+                        <% }) %>                        
+                    </ul>
+                </div>
+                <div id="addForm">
+                    <form class="add" action="/" method="POST" id="confirmForm">
+                        <div class="promo__interactive-title">ADD NEW</div>
+                        <span>Enter the title of the movie</span>
+                        <input class="adding__input" type="text" name="newMovie" placeholder="Movie title...?" autocomplete="off">
+                        <span>Add to favorites?</span>
+                        <input type="checkbox" name="checkBox">
+                        <button type="submit" name="button">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        let genre = document.getElementById('promo__genre');
+        let title = document.getElementById('promo__title');
+        let descr = document.getElementById('promo__descr');
+
+        function genreChange() {
+            setTimeout(() => genre.innerHTML="Drama", 1000);
+            setTimeout(() => title.innerHTML="The Martian", 1000);
+            setTimeout(() => descr.innerHTML="THE STORY OF A MAN SURVIVING ON ANOTHER PLANET ALONE", 1000);
+
+            setTimeout(() => genre.innerHTML="Action", 5000);
+            setTimeout(() => title.innerHTML="The Avengers", 5000);
+            setTimeout(() => descr.innerHTML="THE STORY OF SUPERHEROES SAVING THE WORLD", 5000);
+
+            setTimeout(() => genre.innerHTML="Comedy", 22000);
+            setTimeout(() => title.innerHTML="Intouchables", 22000);
+            setTimeout(() => descr.innerHTML="The ex-criminal brings back a taste for life to a prim aristocrat, confined to a wheelchair", 22000);
+        }
+        genreChange();
+
+        setInterval(() => genre.innerHTML="Drama", 30000);
+        setInterval(() => title.innerHTML="The Martian", 30000);
+        setInterval(() => descr.innerHTML="THE STORY OF A MAN SURVIVING ON ANOTHER PLANET ALONE", 30000);
+
+        setInterval(() => genre.innerHTML="Action", 35000);
+        setInterval(() => title.innerHTML="The Avengers", 35000);
+        setInterval(() => descr.innerHTML="THE STORY OF SUPERHEROES SAVING THE WORLD", 35000);
+
+        setInterval(() => genre.innerHTML="Comedy", 52000);
+        setInterval(() => title.innerHTML="Intouchables", 52000);
+        setInterval(() => descr.innerHTML="The ex-criminal brings back a taste for life to a prim aristocrat, confined to a wheelchair", 52000);
+        
+        function search(e) {
+            let search_input = e.target.value.toLowerCase();
+            if(document.getElementById("whToWatch").classList.contains("promo__menu-item_active")){
+                let search_items = document.querySelectorAll(".promo__interactive-list li");
+
+                search_items.forEach(function(item){
+                    if(item.textContent.toLowerCase().includes(search_input) == true){
+                        item.closest("li").style.display = "block";
+                    }
+                    else{
+                        item.closest("li").style.display = "none";
+                    }
+                })
+            }
+            else{
+                let search_items_fav = document.querySelectorAll("#favList li");
+
+                if(search_input.length>=1) {
+                    search_items_fav.forEach(function(item){
+                        if(item.textContent.toLowerCase().includes(search_input) == true){
+                            item.closest("li").style.display = "block";
+                        
+                        }else{
+                            item.closest("li").style.display = "none";
+                        }
+                    })
+                }else{
+                    favorite(event);
+                }
+            }   
+        }
+
+        function favorite(e){
+            e.preventDefault();
+            const whToWatch = document.getElementById("whToWatch");
+            const favorites = document.getElementById("favorites");
+            const deleteBtn = document.querySelectorAll(".delete");
+            const confirmForm = document.getElementById("confirmForm");
+            const promoTitle = document.getElementById("promoTitle");
+            const promoList = document.querySelector(".promo__interactive-list");
+            let promoLi = document.querySelectorAll(".promo__interactive-list li");
+           
+            whToWatch.classList.remove("promo__menu-item_active");
+            favorites.classList.add("promo__menu-item_active");
+            promoList.setAttribute("id","favList");
+            confirmForm.style.display = "none";
+            for (i = 0; i < deleteBtn.length; ++i) {
+                deleteBtn[i].style.display = "none";
+            }
+            promoTitle.innerHTML = "FAVORITES";
+
+            promoLi.forEach(function(item){
+                if(item.childNodes.length>3){
+                    item.closest("li").style.display = "block";
+                }
+                else{
+                    item.closest("li").style.display = "none";
+                }
+            })
+        }
+    </script>
+</body>
+</html>
